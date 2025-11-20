@@ -42,7 +42,6 @@ public class MoviesMovieDAO implements MovieDAO<Movie> {
 
     @Override
     public void insert(Movie movie) {
-        collection.deleteOne(Filters.eq("movie", movie));
         Document document = movie.toDocument();
 
         InsertOneResult result = collection.insertOne(document);
