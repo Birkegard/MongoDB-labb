@@ -59,6 +59,11 @@ public class MovieDaoMongo implements MovieDAO<Document> {
     }
 
     @Override
+    public void findAllFiltered() {
+
+    }
+
+    @Override
     public Document findByTitle(String title) {
         System.out.println("Söker efter filmen...");
         Bson filter = Filters.eq("title", title);
@@ -93,5 +98,15 @@ public class MovieDaoMongo implements MovieDAO<Document> {
         } else {
             System.out.println("Filmen fanns inte eller gick inte att ta bort.");
         }
+    }
+
+    @Override
+    public void deleteAllMoviesByTitle(String title) {
+
+    }
+
+    @Override
+    public void moviesSorted(int year, int year1) {
+
     }
 }

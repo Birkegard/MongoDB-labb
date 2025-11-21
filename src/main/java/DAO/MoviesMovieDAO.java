@@ -1,8 +1,11 @@
 package DAO;
 
 import Model.Movie;
+import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Filters;
+import com.mongodb.client.model.Projections;
+import com.mongodb.client.model.Sorts;
 import com.mongodb.client.model.Updates;
 import com.mongodb.client.result.DeleteResult;
 import com.mongodb.client.result.InsertOneResult;
@@ -42,6 +45,7 @@ public class MoviesMovieDAO implements MovieDAO<Movie> {
 
     @Override
     public void insert(Movie movie) {
+        collection.deleteOne(Filters.eq("title", movie.getTitle()));
         Document document = movie.toDocument();
 
         InsertOneResult result = collection.insertOne(document);
@@ -54,6 +58,20 @@ public class MoviesMovieDAO implements MovieDAO<Movie> {
         return movies.stream()
                 .map(Movie::fromDocument)
                 .toList();
+    }
+
+    @Override
+    public void findAllFiltered() {
+        Bson projection = Projections.fields(
+                Projections.include("title", "year", "genres"),
+                Projections.excludeId()
+        );
+
+        FindIterable<Document> result = collection.find().projection(projection);
+
+        for (Document document : result) {
+            System.out.println(document.toJson());
+        }
     }
 
     @Override
@@ -84,6 +102,40 @@ public class MoviesMovieDAO implements MovieDAO<Movie> {
             System.out.println("Raderade filmen: " + title);
         } else {
             System.out.println("Filmen fanns inte eller gick inte att ta bort.");
+        }
+    }
+
+    @Override
+    public void deleteAllMoviesByTitle(String title) {
+        DeleteResult result = collection.deleteMany(
+                Filters.eq("title", title)
+        );
+
+        if (result.getDeletedCount() > 0) {
+            System.out.println("Raderade filmerna: " + title);
+        } else {
+            System.out.println("Filmen fanns inte eller gick inte att ta bort.");
+        }
+    }
+
+    @Override
+    public void moviesSorted(int year, int year1) {
+        Bson filter = Filters.and(
+                Filters.gte("year", year),
+                Filters.lt("year", year1)
+        );
+        Bson projection = Projections.fields(
+                Projections.include("title", "year", "genres"),
+                Projections.excludeId()
+        );
+        Bson sorting = Sorts.ascending("title");
+
+        FindIterable<Document> result = collection.find(filter)
+                .projection(projection)
+                .sort(sorting);
+
+        for (Document document : result) {
+            System.out.println(document.toJson());
         }
     }
 }

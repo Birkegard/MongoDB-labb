@@ -10,9 +10,15 @@ public interface MovieDAO<T> {
 
     List<T> findAll();
 
+    void findAllFiltered();
+
     T findByTitle(String title);
 
     void updateYearByTitle(String title, int year);
 
     void deleteMovieByTitle(String title);
+
+    void deleteAllMoviesByTitle(String title);
+
+    void moviesSorted(int year, int year1);
 }
